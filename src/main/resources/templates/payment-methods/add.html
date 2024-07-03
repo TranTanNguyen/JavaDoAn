@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Payment Method</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${paymentMethod.id != null} ? 'Edit Payment Method' : 'Add Payment Method'"></h1>
+    <form th:action="@{${paymentMethod.id != null} ? '/payment-methods/edit/' + ${paymentMethod.id} : '/payment-methods/add'}" method="post">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" name="name" class="form-control" th:value="${paymentMethod.name}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+</body>
+</html>

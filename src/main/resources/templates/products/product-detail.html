@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.thymeleaf.org/extras/spring-security5"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${product.name}">Product Detail</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<section layout:fragment="content" class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <img th:src="@{${product.imagePath}}" alt="Hình ảnh sản phẩm" class="img-fluid">
+        </div>
+        <div class="col-md-6">
+            <h1 th:text="${product.name}">Tên sản phẩm</h1>
+            <p th:text="${product.description}">Mô tả sản phẩm</p>
+            <p>Giá: <span th:text="${product.price}">100</span> VND</p>
+            <p>Thể loại: <span th:text="${product.category.name}">Thể loại</span></p>
+            <p class="card-text" th:text="${product.description}"></p>
+            <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                <input type="number" name="quantity" min="1" value="1" class="form-control mb-2" style="width: 70px;">
+                <input type="hidden" th:value="${product.id}" name="productId"/>
+                <button type="submit" class="btn btn-warning btn-sm">Thêm Vào Giỏ</button>
+            </form>
+        </div>
+    </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
