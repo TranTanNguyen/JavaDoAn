@@ -98,7 +98,7 @@ public class ProductController {
 
         if (productList.isEmpty()) {
             model.addAttribute("productNotFound", true);
-            return "redirect:/products-list?productNotFound"; // Chuyển hướng về trang danh sách sản phẩm, không phải "/products-list"
+            return "/products/not-found-product"; // Chuyển hướng về trang danh sách sản phẩm, không phải "/products-list"
         } else {
             model.addAttribute("products", productList); // Sửa "posts" thành "products"
             return "/products/product-search";
@@ -112,4 +112,6 @@ public class ProductController {
         model.addAttribute("product", product);
         return "/products/product-detail";
     }
+
+
 }
