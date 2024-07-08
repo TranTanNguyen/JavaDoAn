@@ -86,4 +86,6 @@ public class UserController {
         model.addAttribute("resetSuccess", true);
         return "redirect:/login";
     }
+
+
 }
