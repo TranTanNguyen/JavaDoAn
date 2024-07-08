@@ -7,6 +7,10 @@ import com.example.DoAnJava.utils.Role;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,38 +18,41 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
 @Transactional
-public class UserService implements UserDetailsService{
+public class UserService implements UserDetailsService {
+
     @Autowired
     private IUserRepository userRepository;
     @Autowired
     private IRoleRepository roleRepository;
-    // Lưu người dùng mới vào cơ sở dữ liệu sau khi mã hóa mật khẩu.
+    @Autowired
+    private EmailServices emailServices;
+
+    private Map<String, String> tokens = new HashMap<>();
+
+    // Save new user to the database after encrypting password.
     public void save(@NotNull User user) {
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         userRepository.save(user);
     }
-    // Gán vai trò mặc định cho người dùng dựa trên tên người dùng.
+
+    // Set default role for a user based on username.
     public void setDefaultRole(String username) {
         userRepository.findByUsername(username).ifPresentOrElse(user -> {
-
-                    user.getRoles().add(roleRepository.findRoleById(Role.USER.value));
-                    userRepository.save(user);
-                },
-                () -> { throw new UsernameNotFoundException("User not found"); }
-        );
+            user.getRoles().add(roleRepository.findRoleById(Role.USER.value));
+            userRepository.save(user);
+        }, () -> {
+            throw new UsernameNotFoundException("User not found");
+        });
     }
-    // Tải thông tin chi tiết người dùng để xác thực.
+
+    // Load user details for authentication.
     @Override
-    public UserDetails loadUserByUsername(String username) throws
-            UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return org.springframework.security.core.userdetails.User
@@ -53,51 +60,88 @@ public class UserService implements UserDetailsService{
                 .password(user.getPassword())
                 .authorities(user.getAuthorities())
                 .accountExpired(!user.isAccountNonExpired())
-                .accountLocked(!user.isAccountNonLocked())
+                .accountLocked(!user.isAccountNonLocked()) // Invert account locked status for Spring Security
                 .credentialsExpired(!user.isCredentialsNonExpired())
                 .disabled(!user.isEnabled())
                 .build();
     }
-    // Tìm kiếm người dùng dựa trên tên đăng nhập.
-    public Optional<User> findByUsername(String username) throws
-            UsernameNotFoundException {
+
+    // Find user by username.
+    public Optional<User> findByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username);
     }
 
-    @Autowired
-    private EmailServices emailServices;
-
-    private Map<String, String> tokens = new HashMap<>();
-
+    // Check if email is already registered.
     public boolean isEmailRegistered(String email) {
         return userRepository.findByEmail(email) != null;
     }
 
+    // Create password reset token and store in tokens map.
     public String createPasswordResetToken(String email) {
         String token = UUID.randomUUID().toString();
         tokens.put(token, email);
         return token;
     }
 
+    // Retrieve email by token from tokens map.
     public String getEmailByToken(String token) {
         return tokens.get(token);
     }
 
+    // Send password reset email with token link.
     public void sendPasswordResetEmail(String to, String token) {
-        String subject = "Khôi phục mật khẩu";
-        String text = "Nhấn vào liên kết sau để khôi phục mật khẩu của bạn: " + "http://localhost:9999/reset-password?token=" + token;
+        String subject = "Password Reset";
+        String text = "Click the following link to reset your password: " + "http://localhost:9999/reset-password?token=" + token;
         emailServices.sendEmail(to, subject, text);
     }
 
+    // Update user password after finding by email.
     @Transactional
     public void updatePassword(String email, String newPassword) {
         User user = userRepository.findByEmail(email);
         if (user != null) {
-            user.setPassword(newPassword);
+            user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
             userRepository.save(user);
             System.out.println("Password updated successfully for email: " + email);
         } else {
-            throw new IllegalArgumentException("Không tìm thấy người dùng với email đã cung cấp");
+            throw new IllegalArgumentException("User with provided email not found");
         }
     }
+
+    // Retrieve all users.
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // Find user by ID.
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    // Delete user by ID.
+    public void deleteUserById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    // Toggle user approval status.
+    public void toggleApproval(Long id) {
+        User user = findUserById(id);
+        user.setApproved(!user.isApproved());
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void toggleLock(Long id) {
+        User user = findUserById(id);
+        boolean isLocked = !user.isAccountNonLocked();
+
+        user.setAccountNonLocked(isLocked);
+        userRepository.save(user);
+
+        // If the user is being locked, log them out
+        if (!user.isAccountNonLocked()) {
+            SecurityContextHolder.getContext().setAuthentication(null);
+        }
+    }
+
 }

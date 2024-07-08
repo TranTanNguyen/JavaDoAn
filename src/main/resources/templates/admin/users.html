@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Management</title>
+</head>
+<body>
+<h1>User Management</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Roles</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.roles}"></td>
+        <td>
+            <form th:action="@{/admin/users/approve}" method="post">
+                <input type="hidden" name="username" th:value="${user.username}"/>
+                <button type="submit">Approve</button>
+            </form>
+            <form th:action="@{/admin/users/assign-role}" method="post">
+                <input type="hidden" name="username" th:value="${user.username}"/>
+                <select name="role">
+                    <option value="ROLE_ADMIN">Admin</option>
+                    <option value="ROLE_USER">User</option>
+                </select>
+                <button type="submit">Assign Role</button>
+            </form>
+            <form th:action="@{/admin/users/lock}" method="post">
+                <input type="hidden" name="username" th:value="${user.username}"/>
+                <button type="submit">Lock</button>
+            </form>
+            <form th:action="@{/admin/users/unlock}" method="post">
+                <input type="hidden" name="username" th:value="${user.username}"/>
+                <button type="submit">Unlock</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

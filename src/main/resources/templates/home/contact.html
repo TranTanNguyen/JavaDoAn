@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${title} ?: 'Sản Phẩm'">Liên Hệ</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Hiển thị 3 sản phẩm trên mỗi hàng */
+            gap: 20px; /* Khoảng cách giữa các sản phẩm */
+            padding: 20px;
+        }
+        .product-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            text-align: center; /* Căn giữa nội dung trong sản phẩm */
+            text-decoration: none; /* Loại bỏ gạch chân cho toàn bộ thẻ a */
+        }
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+        }
+        .product-card a {
+            text-decoration: none; /* Loại bỏ gạch chân cho thẻ a */
+            color: inherit; /* Giữ màu chữ như bình thường */
+        }
+        .product-card a:hover {
+            text-decoration: none; /* Đảm bảo gạch chân không xuất hiện khi hover */
+        }
+        .button4 {
+            background-color: #ff9900;
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .button4:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #ff9900;
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container">
+        <h1>CHÍNH SÁCH BẢO HÀNH</h1>
+
+        <p>TripleTrouble bảo hành qua số điện thoại đặt hàng của quý khách. Kể từ khi xuất kho, hệ thống sẽ tự tạo phiếu bảo hành cho sản phẩm của quý khách theo thời gian bảo hành đã thông báo trên website (trừ các sản phẩm không sử dụng điện như keycap, núm xoay, dụng su mods, switch, v.v)</p>
+
+        <h2>A. Địa điểm bảo hành:</h2>
+        <ul>
+            <li>Toàn bộ sản phẩm được phân phối và bán lẻ bởi TripleTrouble đều được bảo hành tại địa chỉ của TripleTrouble</li>
+            <li>Đối với những đơn hàng mua hàng từ xa, quý khách vui lòng gọi điện, nhắn tin qua Fanpage, Shopee, Zalo để được TripleTrouble hỗ trợ xác định tình trạng sản phẩm</li>
+            <li>Với các trường hợp bảo hành từ xa, quy trình bảo hành thực hiện như sau:
+                <ul>
+                    <li>Quý khách vui lòng đóng gói kỹ sản phẩm để đảm bảo an toàn khi vận chuyển hàng. TripleTrouble sẽ không chịu trách nhiệm khi có các lỗi phát sinh do quá trình vận chuyển.</li>
+                    <li>Bên ngoài kiện hàng vui lòng ghi Tên, SĐT và Địa chỉ của quý khách để shop tiện liên lạc và gửi hàng lai.</li>
+                    <li>Gửi sản phẩm về địa chỉ của TripleTrouble. Chi phí chuyển phát chiều gửi đi quý khách vui lòng tự thanh toán.</li>
+                    <li>Sau khi bảo hành xong, TripleTrouble sẽ liên hệ gửi lại sản phẩm về địa chỉ mà quý khách cung cấp. Chi phí vận chuyển chiều gửi lại do TripleTrouble thanh toán</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>B. Những trường hợp sau không được bảo hành:</h2>
+        <ul>
+            <li>Các sản phẩm không còn nguyên tem niêm phong, tem QC, có hiện tượng bị tháo rời để tự ý can thiệp vào kết cấu bên trong của sản phẩm.</li>
+            <li>Sử dụng nguồn sạc điện trực tiếp đối với các thiết bị không dây, dẫn tới hỏng hóc linh kiện và chức năng sử dụng pin của bàn phím</li>
+            <li>Hư hỏng do tác động vật lý của người tiêu dùng như rơi vỡ, va chạm, vào nước, ẩm thấp, chập cháy.</li>
+            <li>Hư hỏng do thiên tai, động vật, công trùng và do con người gây ra</li>
+            <li>Hiện tượng rỉ sét do yếu tố thời tiết, độ ẩm, thói quen người dùng đều không được bảo hành</li>
+            <li>Hết thời hạn bảo hành kể từ ngày nhận được hàng.</li>
+            <li>Khách hàng tự ý can thiệp vào firmware của sản phẩm.</li>
+        </ul>
+
+        <h2>C. Các trường hợp khác sẽ được bảo hành theo tiêu chuẩn của nhà sản xuất.</h2>
+        <ul>
+            <li>Cụ thể với bàn phím cơ sẽ được bảo hành các lỗi phát sinh do nhà sản xuất mà không phải do người dùng: hỏng mạch, chết led, lỗi kết nối.</li>
+            <li>Các sản phẩm không sử dụng điện như Keycap, Switch, Keypuller, Switch Puller, Lube Station... đều không bảo hành</li>
+        </ul>
+    </div>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

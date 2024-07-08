@@ -5,7 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,16 +16,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration // Đánh dấu lớp này là một lớp cấu hình cho Spring Context.
 @EnableWebSecurity // Kích hoạt tính năng bảo mật web của Spring Security.
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final UserService userService; // Tiêm UserService vào lớp cấu hình này.
+
     @Bean // Đánh dấu phương thức trả về một bean được quản lý bởi Spring Context.
     public UserDetailsService userDetailsService() {
         return new UserService();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); // Bean mã hóa mật khẩu sử dụng BCrypt.
@@ -36,16 +42,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AccessDeniedHandler customAccessDeniedHandler(){
-        return (request, response, accessDeniedException)
-                -> response.sendRedirect(request.getContextPath() + "/error/403");
+    public AccessDeniedHandler customAccessDeniedHandler() {
+        return (request, response, accessDeniedException) -> response.sendRedirect(request.getContextPath() + "/error/403");
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(@NotNull HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/js/**", "/", "/oauth/**", "/register", "/erorr", "/products", "/cart", "/cart/**", "/recover-password", "reset-password")
+                        .requestMatchers("/css/**", "/js/**", "/", "/oauth/**", "/register", "/erorr", "/products",
+                                "/cart", "/cart/**", "/recover-password", "reset-password","/","image/**","/images/**")
                         .permitAll() // Cho phép truy cập không cần xác thực.
                         .requestMatchers("/products/edit/**", "/products/add", "/products/delete", "/categories/add","/categories/edit/**","/categories/delete")
                         .hasAnyAuthority("ADMIN") // Chỉ cho phép ADMIN truy cập.
@@ -55,7 +61,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login") // Trang chuyển hướng sau khi đăng xuất.
+                        .logoutSuccessUrl("/") // Trang chuyển hướng sau khi đăng xuất.
                         .deleteCookies("JSESSIONID") // Xóa cookie.
                         .invalidateHttpSession(true) // Hủy phiên làm việc.
                         .clearAuthentication(true) // Xóa xác thực.
@@ -64,7 +70,7 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login") // Trang đăng nhập.
                         .loginProcessingUrl("/login") // URL xử lý đăng nhập.
-                        .defaultSuccessUrl("/products") // Trang sau đăng nhập thành công.
+                        .defaultSuccessUrl("/") // Trang sau đăng nhập thành công.
                         .failureUrl("/login?error") // Trang đăng nhập thất bại.
                         .permitAll()
                 )
@@ -77,6 +83,7 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .accessDeniedPage("/403") // Trang báo lỗi khi truy cập không được phép.
                 )
+
                 .sessionManagement(sessionManagement -> sessionManagement
                         .maximumSessions(1) // Giới hạn số phiên đăng nhập.
                         .expiredUrl("/login") // Trang khi phiên hết hạn.
@@ -84,8 +91,17 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic
                         .realmName("hutech") // Tên miền cho xác thực cơ bản.
                 )
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.accessDeniedHandler(customAccessDeniedHandler()))
+                .exceptionHandling(exceptionHandling -> {
+                    exceptionHandling.accessDeniedHandler(customAccessDeniedHandler());
+                    exceptionHandling.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)); // Thêm đoạn này để xử lý khi người dùng bị khóa
+                })
+
                 .build(); // Xây dựng và trả về chuỗi lọc bảo mật.
     }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 }
+

@@ -1,42 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security5">
+
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/login-style.css}">
+    <title>TrippleTrouble | Login</title>
 </head>
+
 <body>
-<section layout:fragment="content" class="container mt-5">
-    <h1 class="mb-4">Login</h1>
-    <form th:action="@{/login}" method="post">
-        <div th:if="${param.error}" class="alert alert-danger">
-            Invalid username and password.
+
+<div class="container" id="container">
+    <div class="form-container sign-up">
+        <form th:action="@{/register}" method="post">
+            <h1>Create Account</h1>
+            <div class="social-icons">
+                <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
+            <span>or use your email for registeration</span>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+            <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+            <input type="tel" class="form-control" id="phone" name="phone" placeholder="NumberPhone">
+            <button type="submit" >Sign Up</button>
+        </form>
+    </div>
+    <div class="form-container sign-in">
+        <form th:action="@{/login}" method="post">
+            <div th:if="${param.logout}" class="alert alert-success">
+                You have been logged out.
+            </div>
+            <h1>Sign In</h1>
+            <div class="social-icons">
+                <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+            </div>
+            <div th:if="${param.error}" class="alert alert-danger">
+                Invalid username and password.
+            </div>
+            <span>or use your email password</span>
+            <input type="text" id="user" class="input-field" name="username" placeholder="Username" required>
+            <input type="password" id="pass" class="input-field" name="password" placeholder="Password" required>
+            <a href="#">Forget Your Password?</a>
+            <button type="submit" class="input-submit">Sign In</button>
+        </form>
+    </div>
+    <div class="toggle-container">
+        <div class="toggle">
+            <div class="toggle-panel toggle-left">
+                <h1>Welcome Back!</h1>
+                <p>Enter your personal details to use all of site features</p>
+                <button class="hidden" id="login">Sign In</button>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <h1>Hello, Friend!</h1>
+                <p>Register with your personal details to use all of site features</p>
+                <button class="hidden" id="register">Sign Up</button>
+            </div>
         </div>
-        <div th:if="${param.logout}" class="alert alert-success">
-            You have been logged out.
-        </div>
-        <div class="form-group mb-4">
-            <label for="username"></label>
-            <input type="text" class="form-control" required id="username"
-                   name="username" placeholder="Username">
-        </div>
-        <div class="form-group mb-4">
-            <label for="password"></label>
-            <input type="password" class="form-control" required id="password"
-                   name="password" placeholder="Password">
-        </div>
-        <div class="form-check d-flex justify-content-start mb-4">
-            <input type="checkbox" class="form-check-input" name="remember-me" id="remember-me">
-            <label class="form-check-label" for="remember-me"> Remember me</label>
-        </div>
-        <div class="d-grid gap-2 form-action">
-            <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
-            <p class="mt-3 mb-0">Don't have an account? <a class="text-info text-center" th:href="@{/register}">Sign up?</a> </p>
-            <a href="/recover-password" class="text-primary text-center">Quên mật khẩu? Khôi phục mật khẩu</a>
-        </div>
-    </form>
-</section>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+</div>
+
+<script th:src="@{/js/login-scr.js}"></script>
 </body>
+
 </html>
