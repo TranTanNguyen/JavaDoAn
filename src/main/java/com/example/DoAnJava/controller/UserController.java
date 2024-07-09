@@ -97,23 +97,5 @@ public class UserController {
         model.addAttribute("resetSuccess", true);
         return "redirect:/login";
     }
-    @GetMapping("/user/orders")
-    public String viewUserOrders(Model model) {
-        // Lấy thông tin người dùng hiện tại từ SecurityContext
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
 
-        // Tìm kiếm người dùng trong cơ sở dữ liệu và lấy userId
-        User user = userService.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Long userId = user.getId(); // Giả sử User có phương thức getId()
-
-        // Lấy danh sách đơn hàng của người dùng dựa trên userId
-        List<Order> orders = orderService.findOrdersByUserId(userId);
-
-        // Đưa danh sách đơn hàng vào Model để hiển thị trên view
-        model.addAttribute("orders", orders);
-
-        return "orders-list"; // Trả về tên của template Thymeleaf để hiển thị danh sách đơn hàng
-    }
 }
