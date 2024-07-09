@@ -1,21 +1,32 @@
 package com.example.DoAnJava.controller;
 
+import com.example.DoAnJava.entity.Order;
 import com.example.DoAnJava.entity.User;
+import com.example.DoAnJava.services.OrderService;
 import com.example.DoAnJava.services.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @Controller // Đánh dấu lớp này là một Controller trong Spring MVC.
 @RequestMapping("/")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    @Autowired
+    private OrderService orderService;
     @GetMapping("/login")
     public String login() {
         return "users/login";
@@ -86,6 +97,5 @@ public class UserController {
         model.addAttribute("resetSuccess", true);
         return "redirect:/login";
     }
-
 
 }
