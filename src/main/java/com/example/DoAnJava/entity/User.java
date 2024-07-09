@@ -50,15 +50,8 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-//    @Column(name = "approved")
-//    private boolean approved = false;
-//
-//    @Column(name = "account_non_locked")
-//    private boolean accountNonLocked = true;
-
-    private boolean approved;
-    private boolean accountNonLocked;
-    private List<String> role;
+    private boolean approved = true; // Mặc định phê duyệt
+    private boolean accountNonLocked = true; // Mặc định không bị khóa
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
