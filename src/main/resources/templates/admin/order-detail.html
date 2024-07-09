@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${title} ?: 'Chi tiết đơn hàng'">Chi tiết đơn hàng</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        .table th, .table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+            border-top: 1px solid #dee2e6;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .form-control {
+            width: 50%;
+        }
+        /* CSS for status colors */
+        .status-pending { color: #6c757d; }
+        .status-processing { color: #17a2b8; }
+        .status-shipped { color: #28a745; }
+        .status-delivered { color: #ffc107; }
+        .status-cancelled { color: #dc3545; }
+    </style>
+</head>
+<body>
+<section layout:fragment="content">
+    <h1>Chi tiết đơn hàng</h1>
+
+    <!-- Display order details -->
+    <div class="table-responsive">
+        <table class="table">
+            <tr>
+                <th>Mã đơn hàng</th>
+                <td th:text="${order.id}">1</td>
+            </tr>
+            <tr>
+                <th>Khách hàng</th>
+                <td th:text="${order.customerName}">Người mua hàng</td>
+            </tr>
+            <tr>
+                <th>Địa chỉ</th>
+                <td th:text="${order.shippingAddress}">Địa chỉ giao hàng</td>
+            </tr>
+            <tr>
+                <th>Phương thức thanh toán</th>
+                <td th:text="${order.paymentMethod}">Thanh toán khi nhận hàng</td>
+            </tr>
+            <tr>
+                <th>Số điện thoại</th>
+                <td th:text="${order.phoneNumber}">0123456789</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td th:text="${order.email}">example@example.com</td>
+            </tr>
+            <tr>
+                <th>Tình trạng</th>
+                <td>
+                    <!-- Display current status with dynamic CSS class -->
+                    <span th:text="${order.orderStatus.getDisplayName()}"
+                          th:class="'status-' + ${order.orderStatus.name().toLowerCase()}"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Form to update status -->
+    <form id="updateStatusForm" th:action="@{/admin/updateOrderStatus}" method="post"
+          onsubmit="return onSubmitUpdateStatus()">
+        <input type="hidden" name="orderId" th:value="${order.id}">
+        <select class="form-control" name="newStatus">
+            <!-- Loop through status list -->
+            <option th:each="status : ${orderStatusList}"
+                    th:value="${status.name()}"
+                    th:text="${status.getDisplayName()}"
+                    th:selected="${status == order.orderStatus}"></option>
+        </select>
+        <button type="submit" class="btn btn-primary mt-2">Cập nhật trạng thái</button>
+    </form>
+
+    <!-- Link to go back to order list -->
+    <a href="/admin/list" class="btn btn-secondary mt-2">Quay lại danh sách đơn hàng</a>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    /* Script to update status color dynamically */
+    var statusElement = document.querySelector('.status-' + /* Thymeleaf expression to get current status name */ );
+    var currentStatus = /* Thymeleaf expression to get current status */;
+    statusElement.classList.add('status-' + currentStatus.toLowerCase());
+
+    /* Function to handle form submission */
+    function onSubmitUpdateStatus() {
+        // Perform any validation if needed
+
+        // Assuming the update is successful, redirect to order list
+        window.location.href = '/admin/list';
+        return false; // Prevent actual form submission
+    }
+</script>
+</body>
+</html>
